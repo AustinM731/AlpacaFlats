@@ -76,8 +76,7 @@ class commandstring:
 @before(PreProcessRequest(maxdev))
 class Connected:
     def on_get(self, req: Request, resp: Response, devnum: int):
-        # Assuming 'device' is an instance of either the actual device class or the simulator
-        is_conn = calibrator_device.connected  # Reads the connection state from the device or simulator
+        is_conn = calibrator_device.connected
         resp.text = PropertyResponse(is_conn, req).json
 
     def on_put(self, req: Request, resp: Response, devnum: int):
@@ -85,9 +84,9 @@ class Connected:
         conn = to_bool(conn_str)  # Raises 400 Bad Request if str to bool fails
         try:
             if conn:
-                calibrator_device.connect()  # Connects the device or simulator
+                calibrator_device.connect()
             else:
-                calibrator_device.disconnect()  # Disconnects the device or simulator
+                calibrator_device.disconnect()
             resp.text = MethodResponse(req).json
         except Exception as ex:
             resp.text = MethodResponse(req, DriverException(0x500, 'Covercalibrator.Connected failed', ex)).json
@@ -130,12 +129,10 @@ class Brightness:
         if calibrator_device.calibrator_state == 0:
             resp.text = PropertyResponse(None, req, PropertyNotImplementedException()).json
             return
-        # Check if the simulator is connected
         if not calibrator_device.connected:
             resp.text = PropertyResponse(None, req, NotConnectedException()).json
             return
         try:
-            # Get the brightness property from the simulator
             val = calibrator_device.brightness
             resp.text = PropertyResponse(val, req).json
         except Exception as ex:
@@ -146,12 +143,10 @@ class Brightness:
 class CalibratorState:
 
     def on_get(self, req: Request, resp: Response, devnum: int):
-        # Check if the simulator is connected
         if not calibrator_device.connected:
             resp.text = PropertyResponse(None, req, NotConnectedException()).json
             return
         try:
-            # Get the calibrator state property from the simulator
             val = calibrator_device.calibrator_state
             resp.text = PropertyResponse(val, req).json
         except Exception as ex:
@@ -162,12 +157,10 @@ class CalibratorState:
 class CoverState:
 
     def on_get(self, req: Request, resp: Response, devnum: int):
-        # Check if the simulator is connected
         if not calibrator_device.connected:
             resp.text = PropertyResponse(None, req, NotConnectedException()).json
             return
         try:
-            # Get the cover state property from the simulator
             val = calibrator_device.cover_state
             resp.text = PropertyResponse(val, req).json
         except Exception as ex:
@@ -181,12 +174,10 @@ class MaxBrightness:
         if calibrator_device.calibrator_state == 0:
             resp.text = PropertyResponse(None, req, PropertyNotImplementedException()).json
             return
-        # Check if the simulator is connected
         if not calibrator_device.connected:
             resp.text = PropertyResponse(None, req, NotConnectedException()).json
             return
         try:
-            # Get the maximum brightness property from the simulator
             val = calibrator_device.max_brightness
             resp.text = PropertyResponse(val, req).json
         except Exception as ex:
@@ -200,12 +191,10 @@ class CalibratorOff:
         if calibrator_device.calibrator_state == 0:
             resp.text = MethodResponse(req, MethodNotImplementedException()).json
             return
-        # Check if the simulator is connected
         if not calibrator_device.connected:
             resp.text = PropertyResponse(None, req, NotConnectedException()).json
             return
         try:
-            # Turn off the calibrator in the simulator
             calibrator_device.turn_off()
             resp.text = MethodResponse(req).json
         except Exception as ex:
@@ -227,7 +216,6 @@ class calibratoron:
             resp.text = MethodResponse(req,
                             InvalidValueException(f'Brightness " + brightnessstr + " not a valid number.')).json
             return
-        ### RANGE CHECK AS NEEDED ###          # Raise Alpaca InvalidValueException with details!
         if brightness < 0 or brightness > 100:
             resp.text = MethodResponse(req,
                             InvalidValueException(f'Brightness {brightness} out of range.')).json
@@ -247,12 +235,10 @@ class CloseCover:
         if calibrator_device.cover_state == 0:
             resp.text = MethodResponse(req, MethodNotImplementedException()).json
             return
-        # Check if the simulator is connected
         if not calibrator_device.connected:
             resp.text = PropertyResponse(None, req, NotConnectedException()).json
             return
         try:
-            # Close the cover in the simulator
             calibrator_device.close_cover()
             resp.text = MethodResponse(req).json
         except Exception as ex:
@@ -266,12 +252,10 @@ class OpenCover:
         if calibrator_device.cover_state == 0:
             resp.text = MethodResponse(req, MethodNotImplementedException()).json
             return
-        # Check if the simulator is connected
         if not calibrator_device.connected:
             resp.text = PropertyResponse(None, req, NotConnectedException()).json
             return
         try:
-            # Open the cover in the simulator
             calibrator_device.open_cover()
             resp.text = MethodResponse(req).json
         except Exception as ex:
@@ -285,14 +269,11 @@ class HaltCover:
         if calibrator_device.cover_state == 0:
             resp.text = MethodResponse(req, MethodNotImplementedException()).json
             return
-        # Check if the simulator is connected
         if not calibrator_device.connected:
             resp.text = PropertyResponse(None, req, NotConnectedException()).json
             return
         try:
-            # Halt any ongoing cover operation in the simulator
             calibrator_device.halt_cover()
             resp.text = MethodResponse(req).json
-            # resp.text = MethodResponse(req, MethodNotImplementedException()).json
         except Exception as ex:
             resp.text = MethodResponse(req, DriverException(0x500, 'Covercalibrator.Haltcover failed', ex)).json
