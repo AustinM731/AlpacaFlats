@@ -1,4 +1,6 @@
 import RPi.GPIO as GPIO
+import subprocess
+from log import logger
 
 class CoverCalibratorDevice:
     """
@@ -32,6 +34,13 @@ class CoverCalibratorDevice:
             self.pwm_device.stop()
             GPIO.cleanup()
             self.connected = False
+
+            restart_command = "sudo systemctl restart AlpacaFlats.service"
+            try:
+                subprocess.run(restart_command, shell=True, check=True)
+                logger.info("Service restarted successfully.")
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Failed to restart service: {e}")
 
     def turn_on(self, brightness):
         """
