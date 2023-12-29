@@ -14,7 +14,7 @@ class CoverCalibratorDevice:
         self.max_brightness = 100
         self.cover_state = 0  # 0 for absent, 1 for closed, 2 for moving, 3 for open, 4 for Unknown, 5 for Error
         self.pwm_pin = 12
-        self.pwm_frequency = 100  # PWM frequency in Hz (100 Hz is a good starting point, bump this value if you see flickering)
+        self.pwm_frequency = 100000  # PWM frequency in Hz (100000 Hz is a good starting point, bump this value if you see flickering)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pwm_pin, GPIO.OUT)
         self.pwm_device = GPIO.PWM(self.pwm_pin, self.pwm_frequency)
